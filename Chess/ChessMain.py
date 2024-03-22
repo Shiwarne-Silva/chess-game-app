@@ -29,6 +29,41 @@ def main():
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
     gs = ChessEngine.GameState()
-    print(gs.board)
+    loadImages() # only do this once, before the while loop.
+    running = True
+    while running:
+        for e in p.event.get():
+            if e.type == p.QUIT:
+                running = False
+            drawGameState(screen, gs)
+            clock.tick(MAX_FPS)
+            p.display.flip()
 
-main()
+'''
+Responsible for all graphics within a current game state.
+'''
+def drawGameState(screen, gs):
+    drawBoard(screen) # draw squares on the board.
+    #add in piece highlighting or move suggestions (later)
+    drawPieces(screen, gs.board)
+
+
+'''
+Draw the squares on the board. top let square is always light
+'''
+def drawBoard(screen):
+    colors = [p.Color("white"), p.color("gray")]
+    for r in range(DIMENSION):
+        for c in range(DIMENSION):
+            color = colors[((r+c) % 2)]
+            p.draw.rect(screen, color, p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE))
+'''
+draw the pieces on the board using current GameState.board
+'''
+def drawPieces(screen, board):
+    pass
+
+
+
+if __name__ == "__main__":
+    main()
