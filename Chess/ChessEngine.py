@@ -23,6 +23,52 @@ class GameState():
         self.moveLog.append(move)
         self.whiteToMove = not self.whiteToMove #swapping players
 
+    '''
+    undo the last move made
+    '''
+
+    def undoMove(self):
+        if len(self.moveLog) != 0:
+            move = self.moveLog.pop()  # Remove the last move from the move log
+            self.board[move.startRow][move.startCol] = move.pieceMoved  # Restore the piece to its original position
+            self.board[move.endRow][move.endCol] = move.pieceCaptured  # Restore any captured piece if applicable
+            self.whiteToMove = not self.whiteToMove  # Switch back to the previous player's turn
+
+
+    '''
+    All moves considering checks
+    '''
+    def getValidMoves(self):
+        return self.getAllPossibleMoves()
+
+    '''
+    All moves withput considering checks
+    '''
+    def getAllPossibleMoves(self):
+        moves = [Move((6, 4), (4, 4), self.board)]
+        for r in range(len(self.board)): #number of rows
+            for c in range(len(self.board[r])): #number of cols in given row
+                turn = self.board[r][c][0]
+                if (turn == 'w' and self.whiteToMove) and (turn == 'b' and not self.whiteToMove):
+                    piece = self.board[r][c][1]
+                    if piece == 'p':
+                        self.getPawnMoves(r, c, moves)
+                    elif piece == 'R':
+                        self.getRookMoves(r, c, moves)
+        return moves
+    '''
+    Get all the pawn moves for the pawn located at row, col and add these moves to the list
+    '''
+    def getPawnMoves(self, r, c, moves):
+        pass
+
+    '''
+        Get all the rook moves for the rook located at row, col and add these moves to the list
+    '''
+
+    def getRookMoves(self, r, c, moves):
+        pass
+
 class Move():
     # maps keys to values
     # key : value
@@ -33,13 +79,23 @@ class Move():
                    "e": 4, "f": 5, "g": 6, "h": 7}
     colsToFiles = {v: k for k, v in filesToCols.items()}
 
-    def __int__(self, startSq, endSq, board):
+    def __init__(self, startSq, endSq, board):
         self.startRow = startSq[0]
         self.startCol = startSq[1]
         self.endRow = endSq[0]
         self.endCol = endSq[1]
         self.pieceMoved = board[self.startRow][self.startCol]
         self.pieceCaptured = board[self.endRow][self.endCol]
+        self.moveID = self.startRow * 1000 + self.startCol * 100 + self.endRow * 10 + self.endCol
+        print(self.moveID)
+
+    '''
+    Overiding the equals method
+    '''
+    def __eq__(self, other):
+        if isinstance(other, Move):
+            return self.moveID == other.moveID
+        return False
 
     def getChessNotation(self):
         return self.getRankFile(self.startRow, self.startCol) + self.getRankFile(self.endRow, self.endCol)

@@ -29,14 +29,19 @@ def main():
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
     gs = ChessEngine.GameState()
+    validMoves = gs.getValidMoves()
+    moveMade = False #flag variable for when a move is made
+
     loadImages() # only do this once, before the while loop.
     running = True
     sqSelected = () #no square is selected, keep track of the last click of the user
     playerClicks = [] #keep track of player clicks
+
     while running:
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
+            # Mouse Handler
             elif e.type == p.MOUSEBUTTONDOWN:
                 location = p.mouse.get_pos()
                 col = location[0]//SQ_SIZE
@@ -49,9 +54,21 @@ def main():
                     playerClicks.append(sqSelected) #append for both 1st and 2nd clicks
                 if len(playerClicks) == 2: #after the 2nd click
                     move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
-                    print((move.getChessNotation()))
-                    gs.makeMove(move)
-                    sqSelected = [] # resetting the user clicks
+                    print(move.getChessNotation())
+                    if move in validMoves:
+                        gs.makeMove(move)
+                        moveMade = True
+                    sqSelected = () # resetting the user clicks
+                    playerClicks = []
+            # Key Handlers
+            elif e.type == p.KEYDOWN:
+                if e.key == p.K_z: # Undo when 'z' is pressed.
+                    gs.undoMove()
+                    moveMade = True
+
+            if moveMade:
+                validMoves = gs.getValidMoves()
+                moveMade = False
 
             drawGameState(screen, gs)
             clock.tick(MAX_FPS)
