@@ -23,6 +23,18 @@ class GameState():
         self.moveLog.append(move)
         self.whiteToMove = not self.whiteToMove #swapping players
 
+    '''
+    undo the last move made
+    '''
+
+    def undoMove(self):
+        if len(self.moveLog) != 0:
+            move = self.moveLog.pop()  # Remove the last move from the move log
+            self.board[move.startRow][move.startCol] = move.pieceMoved  # Restore the piece to its original position
+            self.board[move.endRow][move.endCol] = move.pieceCaptured  # Restore any captured piece if applicable
+            self.whiteToMove = not self.whiteToMove  # Switch back to the previous player's turn
+
+
 class Move():
     # maps keys to values
     # key : value
