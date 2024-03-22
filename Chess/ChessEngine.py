@@ -45,7 +45,7 @@ class GameState():
     All moves withput considering checks
     '''
     def getAllPossibleMoves(self):
-        moves = []
+        moves = [Move((6, 4), (4, 4), self.board)]
         for r in range(len(self.board)): #number of rows
             for c in range(len(self.board[r])): #number of cols in given row
                 turn = self.board[r][c][0]
@@ -86,6 +86,16 @@ class Move():
         self.endCol = endSq[1]
         self.pieceMoved = board[self.startRow][self.startCol]
         self.pieceCaptured = board[self.endRow][self.endCol]
+        self.moveID = self.startRow * 1000 + self.startCol * 100 + self.endRow * 10 + self.endCol
+        print(self.moveID)
+
+    '''
+    Overiding the equals method
+    '''
+    def __eq__(self, other):
+        if isinstance(other, Move):
+            return self.moveID == other.moveID
+        return False
 
     def getChessNotation(self):
         return self.getRankFile(self.startRow, self.startCol) + self.getRankFile(self.endRow, self.endCol)
