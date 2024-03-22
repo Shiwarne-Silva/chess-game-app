@@ -57,6 +57,8 @@ def drawBoard(screen):
         for c in range(DIMENSION):
             color = colors[((r+c) % 2)]
             p.draw.rect(screen, color, p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE))
+
+
 '''
 draw the pieces on the board using current GameState.board
 '''
