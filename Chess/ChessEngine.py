@@ -21,6 +21,8 @@ class GameState:
         self.moveLog = []
         self.whiteKingLocation = (7, 4)
         self.blackKingLocation = (0, 4)
+        self.checkMate = False
+        self.staleMate = False
 
     def makeMove(self, move):
         self.board[move.startRow][move.startCol] = "--"
@@ -59,10 +61,22 @@ class GameState:
         # 2. For each move, make the move
         for i in range(len(moves) - 1, -1, -1):  # When removing from a list, go backwards through that list
             self.makeMove(moves[i])
-        # 3. Generate all possible moves for the opposite player
-        oppMoves = self.getAllPossibleMoves()
-        # 4. For each of the opponent's moves, see if any of them attack the current player's king
-        # 5. If any of the opponent's moves attack the current player's king, then the move is invalid
+            # 3. Generate all possible moves for the opposite player
+            # 4. For each of the opponent's moves, see if any of them attack the current player's king
+            self.whiteToMove = not self.whiteToMove
+            if self.inCheck():
+                moves.remove(moves[i])
+            self.whiteToMove = not self.whiteToMove
+            self.undoMove()
+        if len(moves) == 0: # Either checkmate or stalemate
+            if self.inCheck():
+                self.checkMate = True
+            else:
+                self.staleMate = True
+        else:
+            self.checkMate = False
+            self.staleMate = False
+            
         return moves
 
 
@@ -76,9 +90,17 @@ class GameState:
             return self.squareUnderAttack(self.blackKingLocation[0], self.blackKingLocation[1])
 
     '''
-    Determine if the current player is in checkmate
+    Determine if the enemy can attack the square r, c
     '''
     def squareUnderAttack(self, r, c):
+        self.whiteToMove = not self.whiteToMove #Switch to opponent's turn
+        oppMoves = self.getAllPossibleMoves()
+        self.whiteToMove = not self.whiteToMove #Switch back to own turn
+        for move in oppMoves:
+            if move.endRow == r and move.endCol == c: #Square is under attack
+                self.whiteToMove = not self.whiteToMove #Switch back to own turn
+                return True
+        return False
 
 
     '''
