@@ -168,6 +168,7 @@ class GameState:
                 if endPiece[0] != allyColor: #not an ally piece (empty or enemy piece)
                     moves.append(Move((r, c), (endRow, endCol), self.board))
 
+
 class Move():
     # maps keys to values
     # key : value
