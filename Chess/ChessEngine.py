@@ -19,30 +19,54 @@ class GameState:
 
         self.whiteToMove = True
         self.moveLog = []
+        self.whiteKingLocation = (7, 4)
+        self.blackKingLocation = (0, 4)
 
     def makeMove(self, move):
         self.board[move.startRow][move.startCol] = "--"
         self.board[move.endRow][move.endCol] = move.pieceMoved
         self.moveLog.append(move)
         self.whiteToMove = not self.whiteToMove #swapping players
+        #update the king's location if moved
+        if move.pieceMoved == 'wK':
+            self.whiteKingLocation = (move.endRow, move.endCol)
+        elif move.pieceMoved == 'bK':
+            self.blackKingLocation = (move.endRow, move.endCol)
+
 
     '''
     undo the last move made
     '''
-
     def undoMove(self):
         if len(self.moveLog) != 0:
             move = self.moveLog.pop()  # Remove the last move from the move log
             self.board[move.startRow][move.startCol] = move.pieceMoved  # Restore the piece to its original position
             self.board[move.endRow][move.endCol] = move.pieceCaptured  # Restore any captured piece if applicable
             self.whiteToMove = not self.whiteToMove  # Switch back to the previous player's turn
+            # Update the king's location if needed
+            if move.pieceMoved == 'wK':
+                self.whiteKingLocation = (move.startRow, move.startCol)
+            elif move.pieceMoved == 'bK':
+                self.blackKingLocation = (move.startRow, move.startCol)
 
 
     '''
     All moves considering checks
     '''
     def getValidMoves(self):
-        return self.getAllPossibleMoves()
+        # 1. Generate all possible moves
+        moves = self.getAllPossibleMoves()
+        # 2. For each move, make the move
+        for i in range(len(moves) - 1, -1, -1):  # When removing from a list, go backwards through that list
+            self.makeMove(moves[i])
+        # 3. Generate all possible moves for the opposite player
+        oppMoves = self.getAllPossibleMoves()
+        # 4. For each of the opponent's moves, see if any of them attack the current player's king
+        # 5. If any of the opponent's moves attack the current player's king, then the move is invalid
+        return moves
+
+    def inCheck(self):
+        
 
     '''
     All moves without considering checks
