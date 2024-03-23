@@ -23,6 +23,7 @@ class GameState:
         self.inCheck = False
         self.pins = []
         self.checks = []
+        self.enpassantPossible = () #sq. where en passant capture is possible
 
     def makeMove(self, move):
         self.board[move.endRow][move.endCol] = move.pieceMoved
@@ -147,9 +148,14 @@ class GameState:
             if c-1 >= 0: #captures to the left
                 if self.board[r-1][c-1][0] == 'b': #enemy piece to capture to the left
                     moves.append(Move((r, c), (r-1, c-1), self.board))
+                elif (r-1, c-1) == self.enpassantPossible:
+                    moves.append(Move((r, c), (r-1, c-1), self.board, isEnpassantMove=True))
             if c+1 <= 7: #captures to the right
                 if self.board[r-1][c+1][0] == 'b': #enemy piece to capture to the right
                     moves.append(Move((r, c), (r-1, c+1), self.board))
+                elif (r-1, c+1) == self.enpassantPossible:
+                    moves.append(Move((r, c), (r-1, c+1), self.board, isEnpassantMove=True))
+                    
         else: #black pawn moves
             if self.board[r+1][c] == "--": #1 square pawn advance
                 moves.append(Move((r, c), (r+1, c), self.board))
@@ -355,16 +361,18 @@ class Move():
                    "e": 4, "f": 5, "g": 6, "h": 7}
     colsToFiles = {v: k for k, v in filesToCols.items()}
 
-    def __init__(self, startSq, endSq, board):
+    def __init__(self, startSq, endSq, board, isEnpassantMove=False):
         self.startRow = startSq[0]
         self.startCol = startSq[1]
         self.endRow = endSq[0]
         self.endCol = endSq[1]
         self.pieceMoved = board[self.startRow][self.startCol]
         self.pieceCaptured = board[self.endRow][self.endCol]
-        self.isPawnPromotion = False
-        if (self.pieceMoved == 'wp' and self.endRow == 0) or (self.pieceMoved == 'bp' and self.endRow == 7):
-            self.isPawnPromotion = True
+        #pawn promotion
+        self.isPawnPromotion = (self.pieceMoved == 'wp' and self.endRow == 0) or (self.pieceMoved == 'bp' and self.endRow == 7)
+        #en passant
+        self.isEnpassantMove = isEnpassantMove
+
         self.moveID = self.startRow * 1000 + self.startCol * 100 + self.endRow * 10 + self.endCol
 
     '''
