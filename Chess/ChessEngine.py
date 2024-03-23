@@ -150,7 +150,8 @@ class GameState:
     Get all the queen moves for the queen located at row, col and add these moves to the list
     '''
     def getQueenMoves(self, r, c, moves):
-        pass
+        self.getRookMoves(r, c, moves)
+        self.getBishopMoves(r, c, moves)
 
 
     '''
