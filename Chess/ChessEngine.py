@@ -9,7 +9,7 @@ class GameState:
             ["bp", "bp", "bp", "bp", "bp", "bp", "bp", "bp"],
             ["--", "--", "--", "--", "--", "--", "--", "--"],
             ["--", "--", "--", "--", "--", "--", "--", "--"],
-            ["--", "--", "wR", "--", "--", "bB", "--", "--"],
+            ["--", "--", "--", "--", "--", "--", "--", "--"],
             ["--", "--", "--", "--", "--", "--", "--", "--"],
             ["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
             ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"]
@@ -19,30 +19,89 @@ class GameState:
 
         self.whiteToMove = True
         self.moveLog = []
+        self.whiteKingLocation = (7, 4)
+        self.blackKingLocation = (0, 4)
+        self.checkMate = False
+        self.staleMate = False
 
     def makeMove(self, move):
         self.board[move.startRow][move.startCol] = "--"
         self.board[move.endRow][move.endCol] = move.pieceMoved
         self.moveLog.append(move)
         self.whiteToMove = not self.whiteToMove #swapping players
+        #update the king's location if moved
+        if move.pieceMoved == 'wK':
+            self.whiteKingLocation = (move.endRow, move.endCol)
+        elif move.pieceMoved == 'bK':
+            self.blackKingLocation = (move.endRow, move.endCol)
+
 
     '''
     undo the last move made
     '''
-
     def undoMove(self):
         if len(self.moveLog) != 0:
             move = self.moveLog.pop()  # Remove the last move from the move log
             self.board[move.startRow][move.startCol] = move.pieceMoved  # Restore the piece to its original position
             self.board[move.endRow][move.endCol] = move.pieceCaptured  # Restore any captured piece if applicable
             self.whiteToMove = not self.whiteToMove  # Switch back to the previous player's turn
+            # Update the king's location if needed
+            if move.pieceMoved == 'wK':
+                self.whiteKingLocation = (move.startRow, move.startCol)
+            elif move.pieceMoved == 'bK':
+                self.blackKingLocation = (move.startRow, move.startCol)
 
 
     '''
     All moves considering checks
     '''
     def getValidMoves(self):
-        return self.getAllPossibleMoves()
+        # 1. Generate all possible moves
+        moves = self.getAllPossibleMoves()
+        # 2. For each move, make the move
+        for i in range(len(moves) - 1, -1, -1):  # When removing from a list, go backwards through that list
+            self.makeMove(moves[i])
+            # 3. Generate all possible moves for the opposite player
+            # 4. For each of the opponent's moves, see if any of them attack the current player's king
+            self.whiteToMove = not self.whiteToMove
+            if self.inCheck():
+                moves.remove(moves[i])
+            self.whiteToMove = not self.whiteToMove
+            self.undoMove()
+        if len(moves) == 0: # Either checkmate or stalemate
+            if self.inCheck():
+                self.checkMate = True
+            else:
+                self.staleMate = True
+        else:
+            self.checkMate = False
+            self.staleMate = False
+            
+        return moves
+
+
+    '''
+    Determine if the current player is in check
+    '''
+    def inCheck(self):
+        if self.whiteToMove:
+            return self.squareUnderAttack(self.whiteKingLocation[0], self.whiteKingLocation[1])
+        else:
+            return self.squareUnderAttack(self.blackKingLocation[0], self.blackKingLocation[1])
+
+    '''
+    Determine if the enemy can attack the square r, c
+    '''
+    def squareUnderAttack(self, r, c):
+        self.whiteToMove = not self.whiteToMove #Switch to opponent's turn
+        oppMoves = self.getAllPossibleMoves()
+        self.whiteToMove = not self.whiteToMove #Switch back to own turn
+        for move in oppMoves:
+            if move.endRow == r and move.endCol == c: #Square is under attack
+                self.whiteToMove = not self.whiteToMove #Switch back to own turn
+                return True
+        return False
+
 
     '''
     All moves without considering checks
