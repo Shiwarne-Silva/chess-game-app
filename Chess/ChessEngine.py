@@ -73,9 +73,9 @@ class GameState:
                 if self.board[r-1][c+1][0] == 'b': #enemy piece to capture to the right
                     moves.append(Move((r, c), (r-1, c+1), self.board))
         else: #black pawn moves
-            if self.board[r+1][c] == "--":
+            if self.board[r+1][c] == "--": #1 square pawn advance
                 moves.append(Move((r, c), (r+1, c), self.board))
-                if r == 1 and self.board[r+2][c] == "--":
+                if r == 1 and self.board[r+2][c] == "--": #2 square pawn advance
                     moves.append(Move((r, c), (r+2, c), self.board))
             if c-1 >= 0: #captures to the left
                 if self.board[r+1][c-1][0] == 'w': #enemy piece to capture to the left
