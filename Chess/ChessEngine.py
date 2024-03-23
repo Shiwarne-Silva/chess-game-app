@@ -65,8 +65,21 @@ class GameState:
         # 5. If any of the opponent's moves attack the current player's king, then the move is invalid
         return moves
 
+
+    '''
+    Determine if the current player is in check
+    '''
     def inCheck(self):
-        
+        if self.whiteToMove:
+            return self.squareUnderAttack(self.whiteKingLocation[0], self.whiteKingLocation[1])
+        else:
+            return self.squareUnderAttack(self.blackKingLocation[0], self.blackKingLocation[1])
+
+    '''
+    Determine if the current player is in checkmate
+    '''
+    def squareUnderAttack(self, r, c):
+
 
     '''
     All moves without considering checks
