@@ -7,13 +7,16 @@ class GameState:
         self.board = [
             ["bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"],
             ["bp", "bp", "bp", "bp", "bp", "bp", "bp", "bp"],
-            ["--", "--", "--", "--", "wp", "--", "--", "--"],
             ["--", "--", "--", "--", "--", "--", "--", "--"],
             ["--", "--", "--", "--", "--", "--", "--", "--"],
-            ["--", "--", "bp", "--", "--", "--", "--", "--"],
+            ["--", "--", "wR", "--", "--", "bB", "--", "--"],
+            ["--", "--", "--", "--", "--", "--", "--", "--"],
             ["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
             ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"]
         ]
+        self.moveFunctions = {'p': self.getPawnMoves, 'R': self.getRookMoves, 'N': self.getKnightMoves,
+                              'B': self.getBishopMoves, 'Q': self.getQueenMoves, 'K': self.getKingMoves}
+
         self.whiteToMove = True
         self.moveLog = []
 
@@ -51,10 +54,7 @@ class GameState:
                 turn = self.board[r][c][0]
                 if (turn == 'w' and self.whiteToMove) or (turn == 'b' and not self.whiteToMove):
                     piece = self.board[r][c][1]
-                    if piece == 'p':
-                        self.getPawnMoves(r, c, moves)
-                    elif piece == 'R':
-                        self.getRookMoves(r, c, moves)
+                    self.moveFunctions[piece](r, c, moves) #call the appropriate move function based on the piece type
         return moves
 
     '''
@@ -84,11 +84,39 @@ class GameState:
                 if self.board[r+1][c+1][0] == 'w': #enemy piece to capture to the right
                     moves.append(Move((r, c), (r+1, c+1), self.board))
 
+
     '''
         Get all the rook moves for the rook located at row, col and add these moves to the list
     '''
-
     def getRookMoves(self, r, c, moves):
+        pass
+
+
+    '''
+    Get all the knight moves for the knight located at row, col and add these moves to the list
+    '''
+    def getKnightMoves(self, r, c, moves):
+        pass
+
+
+    '''
+    Get all the bishop moves for the bishop located at row, col and add these moves to the list
+    '''
+    def getBishopMoves(self, r, c, moves):
+        pass
+
+
+    '''
+    Get all the queen moves for the queen located at row, col and add these moves to the list
+    '''
+    def getQueenMoves(self, r, c, moves):
+        pass
+
+
+    '''
+    Get all the king moves for the king located at row, col and add these moves to the list
+    '''
+    def getKingMoves(self, r, c, moves):
         pass
 
 class Move():
