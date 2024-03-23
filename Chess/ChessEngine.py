@@ -41,6 +41,16 @@ class GameState:
         if move.isPawnPromotion:
             self.board[move.endRow][move.endCol] = move.pieceMoved[0] + 'Q'
 
+        #enpassant move
+        if move.isEnpassantMove:
+            self.board[move.startRow][move.endCol] = "--" #capturing the pawn
+
+        #update enpassantPossible
+        if move.pieceMoved[1] == 'p' and abs(move.startRow - move.endRow) == 2: #2 square pawn advance
+            self.enpassantPossible = ((move.startRow + move.endRow) // 2, move.startCol)
+        else:
+            self.enpassantPossible = ()
+
     '''
     undo the last move made
     '''
@@ -61,6 +71,7 @@ class GameState:
     All moves considering checks
     '''
     def getValidMoves(self):
+        tempEnpassantPossible = self.enpassantPossible
         moves = []
         self.inCheck, self.pins, self.checks = self.checkForPinsAndChecks()
         if self.whiteToMove:
