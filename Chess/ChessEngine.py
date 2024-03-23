@@ -155,7 +155,7 @@ class GameState:
                     moves.append(Move((r, c), (r-1, c+1), self.board))
                 elif (r-1, c+1) == self.enpassantPossible:
                     moves.append(Move((r, c), (r-1, c+1), self.board, isEnpassantMove=True))
-                    
+
         else: #black pawn moves
             if self.board[r+1][c] == "--": #1 square pawn advance
                 moves.append(Move((r, c), (r+1, c), self.board))
@@ -164,9 +164,13 @@ class GameState:
             if c-1 >= 0: #captures to the left
                 if self.board[r+1][c-1][0] == 'w': #enemy piece to capture to the left
                     moves.append(Move((r, c), (r+1, c-1), self.board))
+                elif (r+1, c-1) == self.enpassantPossible:
+                    moves.append(Move((r, c), (r+1, c-1), self.board, isEnpassantMove=True))
             if c+1 <= 7: #captures to the right
                 if self.board[r+1][c+1][0] == 'w': #enemy piece to capture to the right
                     moves.append(Move((r, c), (r+1, c+1), self.board))
+                elif (r+1, c+1) == self.enpassantPossible:
+                    moves.append(Move((r, c), (r+1, c+1), self.board, isEnpassantMove=True))
 
 
     '''
